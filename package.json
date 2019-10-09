@@ -1,0 +1,19 @@
+{
+  "name": "qbosyncnewitems",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^2.3.1",
+    "dotenv": "^8.1.0",
+    "ioredis": "^4.14.1",
+    "moment-timezone": "^0.5.26",
+    "node-quickbooks": "^2.0.33",
+    "pg": "^7.12.1"
+  }
+}
