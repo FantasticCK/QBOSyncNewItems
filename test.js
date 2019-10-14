@@ -175,7 +175,7 @@ const accountRef = {
     "prodExpenseAccountRef": "29",
 };
 
-async function syncNewItemsToQBO(req, res) {
+async function syncNewItemsToQBO() {
 
     /**
      * get new QBO access token. Try twice if failed
@@ -223,6 +223,30 @@ async function syncNewItemsToQBO(req, res) {
                     resolve(null);
                 } else {
                     console.log(`Created item: ${item.Sku}`);
+                    resolve(result);
+                }
+            });
+        });
+    }
+
+    function fetchQBOItems(qbo, query) {
+        return new Promise((resolve, reject) => {
+            qbo.findItems(query, (err, result) => {
+                if (err || !result.QueryResponse.Item) {
+                    resolve(null);
+                } else {
+                    resolve(result.QueryResponse.Item);
+                }
+            });
+        });
+    }
+
+    function updateQBOItem(qbo, newItem) {
+        return new Promise((resolve, reject) => {
+            qbo.updateItem(newItem, (err, result) => {
+                if (err) {
+                    resolve(null);
+                } else {
                     resolve(result);
                 }
             });
@@ -306,8 +330,8 @@ async function syncNewItemsToQBO(req, res) {
     }
 
     await pgClient.connect();
-    let newDWItems = await fetchItemsFromDW(pgClient, query);
-    let newQBOItems = await formatQBONewItems(newDWItems, env);
+    //let newDWItems = await fetchItemsFromDW(pgClient, query);
+    //let newQBOItems = await formatQBONewItems(newDWItems, env);
 
     try {
         let refreshToken;
@@ -329,15 +353,26 @@ async function syncNewItemsToQBO(req, res) {
         await redis.set(`quickbooks:${env}:refreshToken`, JSON.stringify(qbo.refreshToken));
         console.log(`QBO refresh token updated in Redis.`);
 
-        await newQBOItems.syncForEach(async item => {
-            await createQBONewItem(qbo, item);
-        });
-        updateItemsInRedis();
-        res.status(200).send(`QBO sync new items started!`);
+        const fetchItemQuery = {
+            "Sku" : "5344820000-L"
+        };
+
+        const items = await fetchQBOItems(qbo, fetchItemQuery);
+        console.log(items[0]);
+        let itemToUpdate = items[0];
+        itemToUpdate.QtyOnHand -= 10;
+        itemToUpdate.InvStartDate = "2019-10-09";
+        await updateQBOItem(qbo, itemToUpdate);
+        console.log("");
+        // await newQBOItems.syncForEach(async item => {
+        //     await createQBONewItem(qbo, item);
+        // });
+        // updateItemsInRedis();
+
+
     } catch (err) {
         console.log(JSON.stringify(err));
-        res.status(500).send(`QBO sync new items error: ${err}`);
     }
 }
 
-exports.syncNewItemsToQBO = syncNewItemsToQBO;
+syncNewItemsToQBO();

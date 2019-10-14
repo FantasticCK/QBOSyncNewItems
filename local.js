@@ -3,22 +3,22 @@ Array.prototype.syncForEach = async function (callback) {
         await callback(this[index], index, this);
     }
 };// do the job one by one
+
 const {Client} = require("pg");
 const moment = require("moment-timezone");
 const Redis = require("ioredis");
 const QuickBooks = require("node-quickbooks");
 const https = require('https');
 
-//require('dotenv').config();
 const default_timezone = "America/Los_Angeles";
-const QBO_consumerKey = "Q0nwvpTTtGuROBVU3sg3KHEmleExwYbuTSH6cV28pzcbsq3hkK";
-const QBO_consumerSecret = "EhmX8wXni8IfO9XRwwrWg5z8lvOikcpKMRIsC36F";
-const QBO_token = "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..dQ05fiVWXeO08FutLe5yug.or2Q9tZj9J81pVTn_NyroNwdaXRqveLGToC1hMoWZxHWwQqC4lziC2X0jEK_UGuiRSU_CANVwaKzXKW2qLPj5o9JBa7nefYvdHRtajCKlrOZXMGME6cc7nTxK7MbV9GLDiHtUP4rKcckrYXJb1sXC8JHvyq5Ya0YtJI4OLrxCBSQJgFEzojhehbhdUUzOTn_K8TJ61QijSw6xEEzc6A7Q1VETiKRIbAQ6NuTlxL1GW5PNzy1rAWgWRo05n7YHbnDkBxM6Ra9yzElE5Pf-hvWiuJdefHJ3nkaF87tvFpwhNFDT02Wkt-4SvDYFIioawX326u5Ut7RihPSLQmYR0EME72yqvJbQz9x33E7a2TGCToT3q-aI4enriVUH39x5OSFWLNDwS2Ky6gnap-L0MjE_s5xPt-glisYIokDiav-87qKQy8oqydsGjy5cs04hxJ3BVEy5o2ra-ae3ls-L-IEervPD5VhtmPi6jX4PaZMPpAbJuJLxkEpjTzP0RWf78eiBeyQbuxgF-UwcOo3tVYuJJehtAqiRI5uKfzuoxelEaRV8zUjNKlffPKEdfnfnsEBuVR7BrfBmO5KFAhjlTFTZmCUIChflAU7xi9XbSSzAc45KMk-tVkHW_h46GIJP19LbWlh8OyqYFzJv-vlODe_ZSdBzVyo0fl5gQDz6nrXg8QWXRtFeefND4b6kOovePzR.6JdFunn5dX1MaQJtu991IQ";
-const QBO_realmId = "123146391441304";
-const QBO_refreshToken = "Q011565283274wRMLJxnNoDN13Y3pZHQOxhwssEa0GHugBRAup";
+const QBO_consumerKey = "Q0medGU96jopiYEvZO3kPWD7TDsC0M1AIiTT984vcttMSUDxiP";
+const QBO_consumerSecret = "94RTGwwbluu8QRS9I2zcK4wKNDGZwOk0E2oayiCM";
+const QBO_token = "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..EhKRLT18Kx4rM-3uc0B9NA.VlEwcKpV4gGeqYXfnNPvhPKbbVA8zcpygSHzYIsr-eCf9qUeS7V7nozdwTTDJiVMUOIHK7TAsK8DNlf5iCmD54YyHLkJDcxN1DLWu34x1Dwipu578efvkXdBNh-ayLn7G2oUKuKKgWqFaqmMtFmt9Iw3oNPGlsyWzPN3gYNJmd9eJ6GbR4xgNoKgCzEX3Z5_HwqYr6fNkuvP3eqL0wZ1kjphV7X3m0Jg1pG8ZlyDIsXUxzLa6pQUCPw1A2s81rcBxYZIL1b9eMMRCwd8Ydsf-c63D202sMdDOwya2F7PPq8mphrAlXpds88N5kcT_ZSjHL0gYRuyv91alF0QIEAudbnwxm-AMV2BDHtj7-9O2iGhBbaPLHX1z4aPyx2IXskqKwpqgvm6FhasPr4ISvUJUAeesfJ02pNeJNkg67DezRBl7KxD7ab1d_Yb2QWmk974ylRVsLCfD-KmefuYfHhlrOLaezLg5WsC00GDfEEQiqKYj-p1DVENA28ZxQooX5HSziumzroOx_G2voxyZKsnmhyE25T48FZQW6N0qJQ1tN0JmbJImD-6DGzrO70oZkmLJTlI_C1VuEWkayj4BYcPtw2CaLdaP1-IjNCRX6gQ3ztwHKrOKm7jkq76VLMdKIKK3l-HmuMmEE-fnHzJoI6Lk536vH7GdCvf_lZ8qdrnoXezrzTyfcPtQGG6L2_kXS2W.eir-nHq-GZffcbnLL6SAgA";
+const QBO_realmId = "123146321859629";
+const QBO_refreshToken = "Q0115652881630JV15tBvjKdJAFKzw4aOdyHWWxvxU0EaNJYge";
 
-const env = "prod";
-const date = moment().tz(default_timezone).add(-4, "months").toISOString();
+const env = "local";
+const date = moment().tz(default_timezone).add(-1, "months").toISOString();
 const consumerKey = QBO_consumerKey;
 const consumerSecret = QBO_consumerSecret;
 const token = QBO_token;
@@ -48,7 +48,7 @@ const redis = new Redis(17104, "pub-redis-17104.us-central1-1-1.gce.garantiadata
 const query = {
     text: `SELECT * FROM public.product ` +
         `WHERE created_at > '${date}' ` +
-        `ORDER BY id ASC;`
+        `ORDER BY id DESC;`
 };
 
 const categoryRef = {
@@ -176,6 +176,7 @@ const accountRef = {
 };
 
 async function syncNewItemsToQBO(req, res) {
+
     /**
      * get new QBO access token. Try twice if failed
      *
@@ -192,10 +193,12 @@ async function syncNewItemsToQBO(req, res) {
                         } else if (res.error) {
                             reject(res.error);
                         } else {
+                            console.log(`Successfully refreshed QBO access token.`);
                             resolve(res);
                         }
                     });
                 } else {
+                    console.log(`Successfully refreshed QBO access token.`);
                     resolve(res);
                 }
             });
@@ -291,11 +294,12 @@ async function syncNewItemsToQBO(req, res) {
      *
      */
     function updateItemsInRedis() {
-        const url = env === 'local' ?
+        const url = env === "local" ?
             `https://shipit-test.appspot.com/api/Zhihua/qbo/update_items` :
             `https://shipit-production.appspot.com/api/Zhihua/qbo/update_items`;
+        console.log(`Update items in Redis started.`);
         https.get(url, (res) => {
-            console.log(`statusCode: ${res.statusCode}, statusMessage: ${res.statusMessage}`);
+            console.log(`StatusCode: ${res.statusCode}, statusMessage: ${res.statusMessage}`);
         }).on("error", (err) => {
             console.log(JSON.stringify(err));
         });
